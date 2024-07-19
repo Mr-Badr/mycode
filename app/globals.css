@@ -1,0 +1,120 @@
+/* globals.css */
+
+/* Import the Tajawal font with all weights */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;900&display=swap');
+
+/* Define font-face */
+:root {
+  --font-tajawal: 'Tajawal', sans-serif;
+}
+
+/* Apply the font globally to all text elements */
+body, h1, h2, h3, h4, h5, h6, p, span, a, div, li, ul, ol, blockquote, pre, code, table, th, td, input, button, textarea {
+  font-family: var(--font-tajawal) !important;
+}
+
+/* Example of different font weights */
+h1 {
+  font-weight: 900; /* Black */
+}
+
+h2 {
+  font-weight: 700; /* Bold */
+}
+
+h3 {
+  font-weight: 500; /* Medium */
+}
+
+p {
+  font-weight: 400; /* Regular */
+}
+
+.light-text {
+  font-weight: 300; /* Light */
+}
+
+.extra-light-text {
+  font-weight: 200; /* Extra Light */
+}
+
+/* app/styles.css */
+/* .card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.card {
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 200px;
+  text-align: center;
+}
+
+.card:hover {
+  background-color: #f0f0f0;
+}
+
+.content-details {
+  padding: 16px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+ */
+
+/* globals.css or admin.css */
+/* .container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.card a {
+  text-decoration: none;
+  color: #0070f3;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+ */
+ .ql-editor {
+  direction: rtl;
+  text-align: right !important;
+}

@@ -1,0 +1,39 @@
+/* TeacherTable.module.css */
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.table {
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tableLight th, .tableLight td {
+  text-align: right;
+}
+
+.clickableItem {
+  cursor: pointer;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.clickableItem:hover {
+  text-decoration: underline;
+}
+
+.modalContent {
+  direction: rtl;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-start !important; /* Aligns content to the right */
+}
+
+.avatarMd {
+  width: 50px;
+  height: 50px;
+}
