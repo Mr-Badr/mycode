@@ -4,7 +4,7 @@ import "../../../app/globals.css";
 import "@fontsource/tajawal";
 import "../../../assets/fonts/feather/feather.css";
 import React, { useState } from "react";
-import Sidebar from "../admin/_shared/Sidebar";
+import Sidebar from "../admin/_shared/Sidebar2";
 import SimpleBar from "simplebar-react";
 import Navbar from "../admin/_shared/Navbar";
 import SignOutModal from "../_components/SignOutModal";

@@ -1,6 +1,6 @@
 // utils/auth.js
 
-let token = '1|SGXLsW9HyacjrgSkCTtwjBUPKrjkJeQQUsDNzFzs46923d0a';
+let token = '2|cXHOtrdXzv72FdEtXSS292Ju9wcaxGWEY3wpSlGBc1d19d43';
 
 export const getToken = () => {
   return localStorage.getItem('accessToken') || token;

@@ -1,0 +1,28 @@
+.courseDetailContainer {
+  text-align: center;
+}
+
+.courseImage {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.courseTitle {
+  font-size: 2rem;
+  margin: 20px 0;
+}
+
+.courseDescription {
+  font-size: 1.25rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.courseBody {
+  text-align: left;
+  font-size: 1rem;
+  color: #333;
+}

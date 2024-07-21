@@ -57,14 +57,14 @@ function Navbar() {
 						</li>
 
 						{/*  Nav item  */}
-						<li className={pathname === '/student/courses' ? 'nav-item tajawal-bold active' : 'nav-item'}>
+						{/* <li className={pathname === '/student/courses' ? 'nav-item tajawal-bold active' : 'nav-item'}>
 							<Link href="/student/courses" className="nav-link">
 							<i className="nav-icon fe fe-clipboard"></i>
 								<span className={pathname === '/student/courses' ? 'tajawal-bold' : ''}>
 									الدروس
 								</span>
 							</Link>
-						</li>
+						</li> */}
 
 						{/*  Nav item  */}
 						<li className={pathname === '/student/subjects' ? 'nav-item tajawal-bold active' : 'nav-item'}>
@@ -77,14 +77,14 @@ function Navbar() {
 						</li>
 
 						{/*  Nav item  */}
-						<li className={pathname === '/student/exercices' ? 'nav-item tajawal-bold active' : 'nav-item'}>
+						{/* <li className={pathname === '/student/exercices' ? 'nav-item tajawal-bold active' : 'nav-item'}>
 							<Link href="/student/exercices" className="nav-link">
 								<i className="fe fe-edit nav-icon"></i>
 								<span className={pathname === '/student/exercices' ? 'tajawal-bold' : ''}>
 									التمارين
 								</span>
 							</Link>
-						</li>
+						</li> */}
 
 						{/*  Nav item  */}
 						{/* <li className={pathname === '/student/exercices-solution' ? 'nav-item tajawal-bold active' : 'nav-item'}>
@@ -121,20 +121,20 @@ function Navbar() {
 							<Link href="/student/lives" className="nav-link">
 								<i className="fe fe-video nav-icon"></i>
 								<span className={pathname === '/student/lives' ? 'tajawal-bold' : ''}>
-									البثوث المباشرة
+									على المباشر 
 								</span>
 							</Link>
 						</li>
 
 						{/*  Nav item  */}
-						<li className={pathname === '/student/schedual-lives' ? 'nav-item tajawal-bold active' : 'nav-item'}>
+						{/* <li className={pathname === '/student/schedual-lives' ? 'nav-item tajawal-bold active' : 'nav-item'}>
 							<Link href="/student/schedual-lives" className="nav-link">
 								<i className="fe fe-calendar nav-icon"></i>
 								<span className={pathname === '/student/schedual-lives' ? 'tajawal-bold' : ''}>
 									البثوث المبرمجة
 								</span>
 							</Link>
-						</li>
+						</li> */}
 
 						{/*  Nav item  */}
 						<li className={pathname === '/student/payments' ? 'nav-item tajawal-bold active' : 'nav-item'}>
