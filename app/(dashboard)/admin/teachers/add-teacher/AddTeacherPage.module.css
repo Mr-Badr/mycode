@@ -1,0 +1,35 @@
+.returnButton {
+  border-radius: 4px; /* Rounded corners */
+  background-color: #1890ff; /* Primary color for the button */
+  color: #fff; /* White text color */
+  border: none; /* Remove border */
+  padding: 8px 16px; /* Padding for button */
+  font-size: 14px; /* Font size */
+  font-weight: 500; /* Font weight */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.returnButton:hover {
+  background-color: #40a9ff; /* Slightly lighter color on hover */
+}
+
+.formContainer {
+  background: #fff; /* White background for the form */
+  padding: 20px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  max-width: 800px; /* Increase form width */
+  margin: auto; /* Center the form horizontally */
+}
+
+.imagePreview {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.previewImage {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}

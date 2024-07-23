@@ -1,22 +1,18 @@
 "use client";
-// TeacherTable.jsx
+
 import React, { useState, useEffect } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
+import { Table, Button, Dropdown, Menu } from 'antd';
+import { EditOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import axiosInstance from '../../../../../services/axiosInstance'; // Adjust path as per your project structure
-import styles from './TeacherTable.module.css'; // Import CSS Module
-import TeacherDetailsModal from "./TeacherDetailsModal";
+import CourseDetailsModal from "./CourseDetailsModal";
+import SubjectDetailsModal from "./SubjectDetailsModal";
 import EditTeacherModal from "./EditTeacherModal";
 
 const TeacherTable = ({ teachers, handleEditClick, handleDeleteClick }) => {
-  const [showSubjectModal, setShowSubjectModal] = useState(false);
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [showCourseModal, setShowCourseModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [teacherCourses, setTeacherCourses] = useState({});
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState(null);
+  const [teacherCourses, setTeacherCourses] = useState({});
 
   useEffect(() => {
     const fetchCoursesForTeacher = async (teacherId) => {
@@ -35,20 +31,28 @@ const TeacherTable = ({ teachers, handleEditClick, handleDeleteClick }) => {
 
   const handleShowModal = (modalType, data) => {
     switch (modalType) {
-      case 'subject':
-        setSelectedSubject(data);
-        setShowSubjectModal(true);
+      case 'subjectDetails':
+        axiosInstance.get(`/subjects/${data.subject_id}`)
+          .then(response => {
+            setSelectedDetail(response.data.data);
+            setShowDetailsModal(true);
+          })
+          .catch(error => {
+            console.error(`Error fetching subject details for ID ${data.subject_id}:`, error);
+          });
         break;
-      case 'course':
-        setSelectedCourse(data);
-        setShowCourseModal(true);
-        break;
-      case 'details':
-        setSelectedTeacher(data);
-        setShowDetailsModal(true);
+      case 'courseDetails':
+        axiosInstance.get(`/classes/${data.course_id}`)
+          .then(response => {
+            setSelectedDetail(response.data.data);
+            setShowDetailsModal(true);
+          })
+          .catch(error => {
+            console.error(`Error fetching class details for ID ${data.course_id}:`, error);
+          });
         break;
       case 'edit':
-        setSelectedTeacher(data);
+        setSelectedDetail(data);
         setShowEditModal(true);
         break;
       default:
@@ -56,23 +60,9 @@ const TeacherTable = ({ teachers, handleEditClick, handleDeleteClick }) => {
     }
   };
 
-  const handleCloseModal = (modalType) => {
-    switch (modalType) {
-      case 'subject':
-        setShowSubjectModal(false);
-        break;
-      case 'course':
-        setShowCourseModal(false);
-        break;
-      case 'details':
-        setShowDetailsModal(false);
-        break;
-      case 'edit':
-        setShowEditModal(false);
-        break;
-      default:
-        break;
-    }
+  const handleCloseModal = () => {
+    setShowDetailsModal(false);
+    setShowEditModal(false);
   };
 
   const handleSaveTeacher = (updatedTeacher) => {
@@ -80,152 +70,137 @@ const TeacherTable = ({ teachers, handleEditClick, handleDeleteClick }) => {
     setShowEditModal(false);
   };
 
+  const columns = [
+    {
+      title: 'الإسم',
+      dataIndex: 'name',
+      key: 'name',
+      render: (_, record) => (
+        <div className="d-flex align-items-center">
+          <img
+            src={record.image ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/${record.image.replace('public/', '')}` : "../../assets/images/avatar/avatar-12.jpg"}
+            alt={record.name}
+            style={{ borderRadius: '50%', width: '40px', height: '40px', marginRight: '10px' }}
+          />
+          <h6 style={{ marginRight: "1rem" }}>{`${record.first_name} ${record.last_name}`}</h6>
+        </div>
+      ),
+    },
+    {
+      title: 'الوصف',
+      dataIndex: 'bio',
+      key: 'bio',
+      render: text => (
+        <div style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: 'معدل الأجر بالساعة',
+      dataIndex: 'hourly_rate',
+      key: 'hourly_rate',
+    },
+    {
+      title: 'المواد',
+      key: 'subjects',
+      render: (_, record) => (
+        <div>
+          {teacherCourses[record.id] && teacherCourses[record.id].length ? (
+            teacherCourses[record.id].map(courseItem => (
+              <div
+                key={courseItem.course.id}
+                onClick={() => handleShowModal('subjectDetails', courseItem.course)}
+                style={{ cursor: 'pointer', color: '#1890ff' }}
+              >
+                {courseItem.course.subject.name}
+              </div>
+            ))
+          ) : (
+            <div>لا توجد مواد</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: 'الدروس',
+      key: 'courses',
+      render: (_, record) => (
+        <div>
+          {teacherCourses[record.id] && teacherCourses[record.id].length ? (
+            teacherCourses[record.id].map(courseItem => (
+              <div
+                key={courseItem.course.id}
+                onClick={() => handleShowModal('courseDetails', courseItem.course)}
+                style={{ cursor: 'pointer', color: '#1890ff' }}
+              >
+                {courseItem.course.title || 'دورة غير متوفرة'}
+              </div>
+            ))
+          ) : (
+            <div>لا توجد دروس</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: 'الإجراءات',
+      key: 'actions',
+      render: (_, record) => (
+        <Dropdown
+          overlay={
+            <Menu>
+              <Menu.Item key="edit" onClick={() => handleShowModal('edit', record)} icon={<EditOutlined />}>
+                تعديل
+              </Menu.Item>
+              <Menu.Item key="delete" onClick={() => handleDeleteClick(record.id)} icon={<DeleteOutlined />}>
+                حذف
+              </Menu.Item>
+            </Menu>
+          }
+          trigger={['click']}
+        >
+          <Button>
+            <DownOutlined />
+          </Button>
+        </Dropdown>
+      ),
+    },
+  ];
+
   return (
-    <div className={styles.rtl}>
-      <div className="table-responsive">
-        <table className={`${styles.table} table mb-0 text-nowrap table-hover table-centered`}>
-          <thead className={`${styles.tableLight} table-light`}>
-            <tr>
-              <th>الإسم</th>
-              <th>الوصف</th>
-              <th>معدل الأجر بالساعة</th>
-              <th>المواد</th>
-              <th>الدروس</th>
-              <th>الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            {teachers.map((teacher) => (
-              <tr key={teacher.id}>
-                <td>
-                  <div className="d-flex align-items-center">
-                    <img src={teacher.image ? teacher.image : "../../assets/images/avatar/avatar-12.jpg"} alt="" className={`${styles.avatarMd} rounded-circle avatar-md me-2`} />
-                    <h5 className="mb-0 tajawal-bold">{`${teacher.first_name} ${teacher.last_name}`}</h5>
-                  </div>
-                </td>
-                <td className="text-truncate" style={{ maxWidth: '200px' }}>
-                  {teacher.bio}
-                </td>
-                <td style={{ width: '10px' }}>{teacher.hourly_rate}</td>
-                <td>
-                  {teacher.subjects.length ? (
-                    teacher.subjects.map((subject) => (
-                      <div key={subject.id}>
-                        <div
-                          onClick={() => handleShowModal('subject', subject)}
-                          className={styles.clickableItem}
-                        >
-                          {subject.name}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div>لا توجد مواد</div>
-                  )}
-                </td>
-                <td>
-                  {teacherCourses[teacher.id]?.length ? (
-                    teacherCourses[teacher.id].map((courseItem) => (
-                      <div key={courseItem.course.id}>
-                        <div
-                          onClick={() => handleShowModal('course', courseItem.course)}
-                          className={styles.clickableItem}
-                        >
-                          {courseItem.course.title || 'دورة غير متوفرة'}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div>لا توجد دروس</div>
-                  )}
-                </td>
-                <td>
-                  <div className="hstack gap-4">
-                    <span className="dropdown dropstart">
-                      <a className="btn-icon btn btn-ghost btn-sm rounded-circle" href="#" role="button" data-bs-toggle="dropdown" data-bs-offset="-20,20" aria-expanded="false">
-                        <i className="fe fe-more-vertical"></i>
-                      </a>
-                      <span className="dropdown-menu">
-                        <span className="dropdown-header">الإعدادات</span>
-                        <button className="dropdown-item" onClick={() => handleShowModal('details', teacher)}>
-                          <i className="fe fe-eye dropdown-item-icon"></i>
-                          عرض التفاصيل
-                        </button>
-                        <button className="dropdown-item" onClick={() => handleShowModal('edit', teacher)}>
-                          <i className="fe fe-edit dropdown-item-icon"></i>
-                          تعديل
-                        </button>
-                        <button className="dropdown-item" onClick={() => handleDeleteClick(teacher.id)}>
-                          <i className="fe fe-trash dropdown-item-icon"></i>
-                          حذف
-                        </button>
-                      </span>
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div>
+      <Table
+        columns={columns}
+        dataSource={teachers}
+        rowKey="id"
+        pagination={{ pageSize: 10 }}
+      />
 
-      {/* Subject Modal */}
-      <Modal show={showSubjectModal} onHide={() => handleCloseModal('subject')} dialogClassName={styles.modalContent}>
-        <Modal.Header closeButton>
-          <Modal.Title>{selectedSubject?.name || 'موضوع غير متوفر'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p><strong>وصف:</strong> {selectedSubject?.description || 'غير متوفر'}</p>
-          <p><strong>Slug:</strong> {selectedSubject?.slug || 'غير متوفر'}</p>
-        </Modal.Body>
-        <Modal.Footer className={styles.modalFooter}>
-          <Button variant="secondary" onClick={() => handleCloseModal('subject')}>
-            إغلاق
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {showDetailsModal && selectedDetail && selectedDetail.subject && (
+        <SubjectDetailsModal
+          isVisible={showDetailsModal}
+          onClose={handleCloseModal}
+          subjectId={selectedDetail.subject.id}
+        />
+      )}
 
-      {/* Course Modal */}
-      <Modal show={showCourseModal} onHide={() => handleCloseModal('course')} dialogClassName={styles.modalContent}>
-        <Modal.Header closeButton>
-          <Modal.Title>{selectedCourse?.title || 'دورة غير متوفرة'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className={styles.modalBodyContent}>
-            <div className={styles.modalSection}>
-              <h5 className={styles.modalSubTitle}>العنوان:</h5>
-              <p className={styles.modalText}>{selectedCourse?.title || 'غير متوفر'}</p>
-            </div>
-            <div className={styles.modalSection}>
-              <h5 className={styles.modalSubTitle}>الوصف:</h5>
-              <p className={styles.modalText}>{selectedCourse?.description || 'غير متوفر'}</p>
-            </div>
-            <div className={styles.modalSection}>
-              <h5 className={styles.modalSubTitle}>الموضوع:</h5>
-              <p className={styles.modalText}>{selectedCourse?.subject?.name || 'غير متوفر'}</p>
-            </div>
-            <div className={styles.modalSection}>
-              <h5 className={styles.modalSubTitle}>تاريخ الإنشاء:</h5>
-              <p className={styles.modalText}>{selectedCourse ? new Date(selectedCourse.created_at).toLocaleDateString('ar-EG') : 'غير متوفر'}</p>
-            </div>
-            <div className={styles.modalSection}>
-              <h5 className={styles.modalSubTitle}>تاريخ التحديث:</h5>
-              <p className={styles.modalText}>{selectedCourse ? new Date(selectedCourse.updated_at).toLocaleDateString('ar-EG') : 'غير متوفر'}</p>
-            </div>
-          </div>
-        </Modal.Body>
-        <Modal.Footer className={styles.modalFooter}>
-          <Button variant="secondary" onClick={() => handleCloseModal('course')}>
-            إغلاق
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {showDetailsModal && selectedDetail && selectedDetail.course && (
+        <CourseDetailsModal
+          isVisible={showDetailsModal}
+          onClose={handleCloseModal}
+          courseId={selectedDetail.course.id}
+        />
+      )}
 
-      {/* Teacher Details Modal */}
-      <TeacherDetailsModal show={showDetailsModal} onClose={() => handleCloseModal('details')} teacher={selectedTeacher} />
-
-      {/* Edit Teacher Modal */}
-      <EditTeacherModal show={showEditModal} onClose={() => handleCloseModal('edit')} teacher={selectedTeacher} onSave={handleSaveTeacher} />
+      {showEditModal && selectedDetail ? (
+        <EditTeacherModal 
+          show={showEditModal} 
+          onClose={handleCloseModal} 
+          teacher={selectedDetail} 
+          onSave={handleSaveTeacher} 
+        />
+      ) : null}
     </div>
   );
 };

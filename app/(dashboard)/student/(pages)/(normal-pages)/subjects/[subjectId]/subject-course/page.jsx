@@ -31,7 +31,7 @@ function CoursesPage() {
   }, [subjectId]);
 
   const handleCardClick = (courseId) => {
-    router.push(`/subjects/${subjectId}/subject-course/${courseId}`);
+    router.push(`/student/subjects/${subjectId}/subject-course/${courseId}`);
   };
 
   return (
@@ -52,7 +52,7 @@ function CoursesPage() {
                   {courses.map((course) => {
                     const imageUrl = getStorageUrl(course.image);
                     return (
-                      <div className="col-lg-5 col-md-6 col-sm-12" key={course.id}>
+                      <div className="col-lg-4 col-md-6 col-sm-12" key={course.id}>
                         <div 
                           className={styles.courseCard}
                           onClick={() => handleCardClick(course.id)}

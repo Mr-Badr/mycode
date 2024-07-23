@@ -1,35 +1,41 @@
+"use client";
+
 import React from 'react';
 import Link from 'next/link';
+import { Button } from 'antd';
+import { AppstoreOutlined, TableOutlined } from '@ant-design/icons';
 
 const ViewToggle = ({ activeView, setActiveView }) => {
   return (
-    <div className="nav btn-group" role="tablist">
-      <div className='me-2'>
-        <Link href="/admin/teachers/add-teacher" className="btn btn-primary" alt="">إضافة أستاذ جديد</Link>
+    <div className="d-flex justify-content-between align-items-center mb-3">
+      <h1 className="mb-1">الأساتذة</h1>
+      <div className="d-flex align-items-center">
+      <div style={{ display: 'flex', alignItems: 'center', marginLeft: "5px" }}>    
+
+        <Button
+          type={activeView === 'grid' ? 'primary' : 'default'}
+          icon={<AppstoreOutlined />}
+          onClick={() => setActiveView('grid')}
+          style={{
+            borderTopLeftRadius: '0',
+            borderBottomLeftRadius: '0',
+            margin: '0',
+          }}
+        />
+        <Button
+          type={activeView === 'list' ? 'primary' : 'default'}
+          icon={<TableOutlined />}
+          onClick={() => setActiveView('list')}
+          style={{
+            borderTopRightRadius: '0',
+            borderBottomRightRadius: '0',
+            margin: '0',
+          }}
+        /></div>
+        <Button type="primary" style={{ marginLeft: '15px' }}>
+          <Link href="/admin/teachers/add-teacher">إضافة أستاذ جديد</Link>
+        </Button>
       </div>
-      <button
-        className={`btn btn-outline-secondary ${activeView === 'grid' ? 'active' : ''}`}
-        onClick={() => setActiveView('grid')}
-        data-bs-toggle="tab"
-        data-bs-target="#tabPaneGrid"
-        role="tab"
-        aria-controls="tabPaneGrid"
-        aria-selected={activeView === 'grid'}
-      >
-        <span className="fe fe-grid"></span>
-      </button>
-      <button
-        className={`btn btn-outline-secondary ${activeView === 'list' ? 'active' : ''}`}
-        onClick={() => setActiveView('list')}
-        data-bs-toggle="tab"
-        data-bs-target="#tabPaneList"
-        role="tab"
-        aria-controls="tabPaneList"
-        aria-selected={activeView === 'list'}
-        tabIndex="-1"
-      >
-        <span className="fe fe-list"></span>
-      </button>
     </div>
   );
 };

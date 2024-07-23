@@ -37,7 +37,9 @@ p {
 .extra-light-text {
   font-weight: 200; /* Extra Light */
 }
-
+a {
+  text-decoration: none !important;
+}
 /* app/styles.css */
 /* .card-list {
   display: flex;

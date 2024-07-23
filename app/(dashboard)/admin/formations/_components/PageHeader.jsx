@@ -13,7 +13,7 @@ const PageHeader = () => (
       </nav>
     </div>
     <div>
-      <a href="/admin/formations-add" className="btn btn-primary">إضافة دورات جديدة</a>
+      <Link href="/admin/formations/formation-add" className="btn btn-primary">إضافة دورات جديدة</Link>
     </div>
   </div>
 );

@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import axiosinstance from '../../../../../../../../../services/axiosInstance';
 import { getStorageUrl } from '../../../../../../../../../utils/getStorageUrl';
 import styles from './CourseDetailPage.module.css'; // Import your CSS module
+import ComponentHeader from '../../../../../../_components/ComponentHeader';
 
 function CourseDetailPage() {
   const [course, setCourse] = useState(null);
@@ -32,9 +33,11 @@ function CourseDetailPage() {
   return (
     <div dir="rtl">
       <Header />
+
       <main>
         <section className="pt-5 pb-5">
           <div className="container-fluid p-4" style={{ maxWidth: "75%" }}>
+            <ComponentHeader />
             <div className="row mt-0 mt-md-4">
               <div className="col-lg-3 col-md-4 col-12">
                 <Navbar />

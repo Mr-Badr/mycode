@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../../../services/axiosInstance'; // Adjust path as per your project structure
+import axiosInstance from '../../../../services/axiosInstance'; // Adjust path as needed
 import TeacherCard from './_components/TeacherCard';
 import TeacherTable from './_components/TeacherTable';
 import EditTeacherModal from './_components/EditTeacherModal';
 import DeleteTeacherModal from './_components/DeleteTeacherModal';
 import SearchBar from './_components/SearchBar';
 import Breadcrumbs from './_components/Breadcrumbs';
-import Pagination from '../../_helpers/Pagination';
+import Pagination from '../../../(dashboard)/_helpers/Pagination';
 import ViewToggle from './_components/ViewToggle';
 import { toast } from 'react-toastify';
 
@@ -17,13 +17,12 @@ const Page = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState({});
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [teacherIdToDelete, setTeacherIdToDelete] = useState(null);
   const [activeView, setActiveView] = useState('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Number of items per page
 
-  // Fetch teachers
   useEffect(() => {
     fetchTeachers();
   }, []);
@@ -90,25 +89,16 @@ const Page = () => {
     `${teacher.first_name} ${teacher.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination calculations
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredTeachers.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="container-fluid p-6">
-      <div className="col-lg-12 col-md-12 col-12">
-        <div className="border-bottom pb-3 mb-3 d-flex justify-content-between align-items-center">
-          <Breadcrumbs />
-          <ViewToggle activeView={activeView} setActiveView={setActiveView} />
-        </div>
-      </div>
-
+      <ViewToggle activeView={activeView} setActiveView={setActiveView} />
       <SearchBar searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
-
       {activeView === 'grid' ? (
         <div className="row">
           {currentItems.map((teacher) => (
@@ -129,27 +119,28 @@ const Page = () => {
           />
         </div>
       )}
-
       <Pagination
         itemsPerPage={itemsPerPage}
         totalItems={filteredTeachers.length}
         paginate={paginate}
         currentPage={currentPage}
       />
-
-      <EditTeacherModal
-        show={showEditModal}
-        handleClose={handleCloseEditModal}
-        teacher={selectedTeacher}
-        handleInputChange={handleInputChange}
-        handleSaveClick={handleSaveClick}
-      />
-
-      <DeleteTeacherModal
-        show={showDeleteModal}
-        handleClose={handleCloseDeleteModal}
-        confirmDelete={confirmDelete}
-      />
+      {selectedTeacher && (
+        <EditTeacherModal
+          show={showEditModal}
+          handleClose={handleCloseEditModal}
+          teacher={selectedTeacher}
+          handleInputChange={handleInputChange}
+          handleSaveClick={handleSaveClick}
+        />
+      )}
+      {teacherIdToDelete && (
+        <DeleteTeacherModal
+          show={showDeleteModal}
+          handleClose={handleCloseDeleteModal}
+          confirmDelete={confirmDelete}
+        />
+      )}
     </div>
   );
 };

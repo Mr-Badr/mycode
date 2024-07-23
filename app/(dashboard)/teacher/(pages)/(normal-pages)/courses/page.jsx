@@ -9,7 +9,7 @@ import { TiPlus } from "react-icons/ti";
 import AddLessonPopup from "../../(add-pages)/courses-add/page"
 import { toast } from 'react-toastify'; // Import toast from react-toastify
 import axios from 'axios';
-const token = '1|SGXLsW9HyacjrgSkCTtwjBUPKrjkJeQQUsDNzFzs46923d0a'; // Replace with your actual token
+const token = '2|cXHOtrdXzv72FdEtXSS292Ju9wcaxGWEY3wpSlGBc1d19d43'; // Replace with your actual token
 
 
 function Page() {

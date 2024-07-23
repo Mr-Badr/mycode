@@ -17,7 +17,7 @@ const TeacherCard = ({ teacher, handleEditClick, handleDeleteClick }) => {
               className="rounded-circle avatar-xl mb-3"
               alt=""
             />
-            <h4 className="mb-0 tajawal-bold">{`${teacher.first_name} ${teacher.last_name}`}</h4>
+            <h6 className="mb-0 tajawal-bold">{`${teacher.first_name} ${teacher.last_name}`}</h6>
             <p className="mb-0" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {teacher.bio}
             </p>

@@ -6,6 +6,7 @@ import LineChart from './_components/LineChart';
 import DonutChart from './_components/DonutChart';
 import ApexCharts from "apexcharts";
 import Link from 'next/link';
+import { Card } from 'antd'
 
 const Dashboard = () => {
 /* Show model Start */
@@ -271,6 +272,15 @@ useEffect(() => {
     feedbackChart.destroy();
   };
 }, []);
+const cardStyle = {
+  flex: '1',
+  textAlign: 'center',
+  margin: '5px',
+};
+
+const pStyle = {
+  marginBottom: '0'
+};
   return (
     <section className={sectionClassName} style={sectionStyle}>
       <DashboardHeader />
@@ -309,26 +319,22 @@ useEffect(() => {
             </div>
           </div>
           <div className="card-body">
-            <div className="d-flex align-items-center justify-content-between flex-wrap flex-md-nowrap">
-              <div className="w-md-100 d-flex align-items-center mb-3 flex-wrap">
-                <div>
-                  <span>عدد الطلاب المجتهدين</span>
-                  <p className="h3 text-primary me-5">350</p>
-                </div>
-                <div>
-                  <span>عدد التقارير المعلقة</span>
-                  <p className="h3 text-warning me-5">45</p>
-                </div>
-                <div>
-                  <span>عدد الطلاب المحتاجين للدعم</span>
-                  <p className="h3 text-danger me-5">20</p>
-                </div>
-                <div className='flex'>
-                  <span>عدد الطلاب الناجحين</span>
-                  <p className="h3 text-success me-5">300</p>
-                </div>
-              </div>
-            </div>
+          <div className="d-flex align-items-center justify-content-between flex-wrap flex-md-nowrap">
+  <div className="w-md-100 d-flex align-items-center mb-3 flex-wrap">
+    <Card className="me-3" title=" الطلاب المجتهدين" bordered={false} size="small" style={cardStyle}>
+      <p className="h3 text-primary" style={pStyle}>350</p>
+    </Card>
+    <Card className="me-3" title=" التقارير المعلقة" bordered={false} size="small" style={cardStyle}>
+      <p className="h3 text-warning" style={pStyle}>45</p>
+    </Card>
+    <Card className="me-3" title=" الطلاب المحتاجين للدعم" bordered={false} size="small" style={cardStyle}>
+      <p className="h3 text-danger" style={pStyle}>20</p>
+    </Card>
+    <Card className="me-3" title=" الطلاب الناجحين" bordered={false} size="small" style={cardStyle}>
+      <p className="h3 text-success" style={pStyle}>300</p>
+    </Card>
+  </div>
+</div>
 
             <div id="performance_chart"></div>
           </div>

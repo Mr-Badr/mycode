@@ -1,0 +1,21 @@
+/* EditSubjectModal.module.css */
+.formContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* Adjust gap between items */
+}
+
+.formItem {
+  flex: 1 1 45%; /* Two items per row with some gap */
+  min-width: 300px; /* Ensure items are not too small */
+}
+
+.imageContainer {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.previewImage {
+  max-width: 100%;
+  height: auto;
+}

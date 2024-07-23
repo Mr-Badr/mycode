@@ -1,32 +1,40 @@
 "use client"
-
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../../../services/axiosInstance'; // Adjust path as per your project structure
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
-import ReactQuill from 'react-quill'; // Import react-quill
-import 'react-quill/dist/quill.snow.css'; // Add styles for react-quill
+import { Form, Input, Button, Upload, Typography, Row, Col, Divider, Select, InputNumber } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation'; // Use router for navigation
+import styles from './AddTeacherPage.module.css'; // Import the CSS module
 
-const Page = () => {
+const { Title } = Typography;
+const { Option } = Select;
+
+const AddTeacherPage = () => {
   const [formData, setFormData] = useState({
     user_id: '',
     first_name: '',
     last_name: '',
     bio: '',
-    hourly_rate: '0', // Default to '0' as a string
-    slug: ''
+    hourly_rate: '',
+    image: null,
   });
-  const [users, setUsers] = useState([]);
 
-  // Fetch users when the component mounts
+  const [imageFile, setImageFile] = useState(null);
+  const [users, setUsers] = useState([]);
+  const router = useRouter(); // Initialize router for navigation
+
   useEffect(() => {
+    // Fetch users when the component mounts
     const fetchUsers = async () => {
       try {
         const response = await axiosInstance.get('/users');
-        setUsers(response.data.data);
+        setUsers(response.data.data); // Adjust based on the actual response structure
       } catch (error) {
-        console.error('Error fetching users:', error);
+        toast.error('فشل في تحميل قائمة المستخدمين. حاول مرة أخرى.', {
+          position: "bottom-right"
+        });
       }
     };
     fetchUsers();
@@ -34,207 +42,185 @@ const Page = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-    // If the field is user_id or hourly_rate, parse it as a number
-    if (name === 'user_id') {
-      setFormData({ ...formData, [name]: parseFloat(value) });
-    } else {
-      setFormData({ ...formData, [name]: value });
+  const handleImageChange = (info) => {
+    if (info.file.status === 'done') {
+      setImageFile(info.file.originFileObj); // Save the file object
+    } else if (info.file.status === 'error') {
+      toast.error('فشل تحميل الصورة. حاول مرة أخرى.', {
+        position: "bottom-right"
+      });
     }
   };
 
-  const handleIncrement = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      hourly_rate: String(parseFloat(prevData.hourly_rate) + 1)
-    }));
-  };
-
-  const handleDecrement = () => {
-    const rate = parseFloat(formData.hourly_rate);
-    if (rate > 0) {
-      setFormData((prevData) => ({
-        ...prevData,
-        hourly_rate: String(rate - 1)
-      }));
+  const handleSubmit = async (values) => {
+    const formDataToSend = new FormData();
+    formDataToSend.append('user_id', formData.user_id);
+    formDataToSend.append('first_name', formData.first_name);
+    formDataToSend.append('last_name', formData.last_name);
+    formDataToSend.append('bio', formData.bio);
+    formDataToSend.append('hourly_rate', formData.hourly_rate);
+    if (imageFile) {
+      formDataToSend.append('image', imageFile); // Append the image file
     }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
     try {
-      const response = await axiosInstance.post('/teachers', formData);
+      const response = await axiosInstance.post('/teachers', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Ensure the content type is set
+        },
+      });
+
       console.log('Teacher added successfully:', response.data);
-      toast.success('تمت الإضافة بنجاح!', { position: "bottom-right" });
+
+      toast.success('تم إضافة المعلم بنجاح!', {
+        position: "bottom-right"
+      });
+      router.push('/admin/teachers'); // Navigate to the teachers list page
     } catch (error) {
-      console.error('Error adding teacher:', error);
-      console.error('Response data:', error.response.data);
-      toast.error('حدث خطأ أثناء الإضافة. الرجاء المحاولة مرة أخرى.', { position: "bottom-right" });
+      console.error('Error adding teacher:', error.response ? error.response.data : error.message);
+
+      toast.error('حدث خطأ أثناء إضافة المعلم. الرجاء المحاولة مرة أخرى.', {
+        position: "bottom-right"
+      });
     }
   };
 
   return (
     <section className="container-fluid p-4">
-      <div className="row">
-        <div className="col-lg-12 col-md-12 col-12">
-          <div className="border-bottom pb-3 mb-3 d-md-flex align-items-center justify-content-between">
-            <div className="mb-3 mb-md-0">
-              <h1 className="mb-1 tajawal-bold">إضافة أستاذ جديد</h1>
-              <nav aria-label="breadcrumb">
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">
-                    <Link href="/admin">لوحة التحكم</Link>
-                  </li>
-                  <li className="breadcrumb-item"><a href="#">CMS</a></li>
-                  <li className="breadcrumb-item active" aria-current="page">إضافة أستاذ جديد</li>
-                </ol>
-              </nav>
+      <Row gutter={24}>
+        <Col span={24} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: "row-reverse" }}>
+          <Button type="default" onClick={() => router.push('/admin/teachers')} className={styles.returnButton}>
+            الرجوع إلى المعلمين
+          </Button>
+          <Title level={3} className="tajawal-bold" style={{ textAlign: 'right' }}>
+            إضافة معلم جديد
+          </Title>
+        </Col>
+      </Row>
+      <Divider />
+      <Form
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={formData}
+        className={styles.formContainer} // Apply the CSS module class
+      >
+        <Form.Item
+          label="اختيار المستخدم"
+          name="user_id"
+          rules={[{ required: true, message: 'يرجى اختيار مستخدم!' }]}
+        >
+          <Select
+            placeholder="اختر المستخدم"
+            onChange={(value) => setFormData({ ...formData, user_id: value })}
+            allowClear
+          >
+            {users.map(user => (
+              <Option key={user.id} value={user.id}>
+                {user.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          label="الإسم الأول"
+          name="first_name"
+          rules={[{ required: true, message: 'يرجى إدخال الاسم الأول!' }]}
+        >
+          <Input 
+            placeholder="الإسم الأول" 
+            name="first_name"
+            onChange={handleChange}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="الإسم الأخير"
+          name="last_name"
+          rules={[{ required: true, message: 'يرجى إدخال الاسم الأخير!' }]}
+        >
+          <Input 
+            placeholder="الإسم الأخير" 
+            name="last_name"
+            onChange={handleChange}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="السيرة الذاتية"
+          name="bio"
+        >
+          <Input.TextArea 
+            rows={4}
+            placeholder="السيرة الذاتية"
+            name="bio"
+            onChange={handleChange}
+          />
+        </Form.Item>
+
+<Form.Item
+  label="الأجر بالساعة"
+  name="hourly_rate"
+  rules={[
+    { 
+      required: true, 
+      message: 'يرجى إدخال الأجر بالساعة!' 
+    },
+    { 
+      type: 'number', 
+      min: 0, 
+      message: 'يرجى إدخال رقم صحيح أكبر من أو يساوي 0!' 
+    }
+  ]}
+>
+  <InputNumber 
+    placeholder="الأجر بالساعة" 
+    name="hourly_rate"
+    onChange={(value) => handleChange({ target: { name: 'hourly_rate', value } })}
+    min={0}
+    step={0.5} // Allows decimal input
+    style={{ width: '100%' }} // Adjust the width here
+  />
+</Form.Item>
+
+
+        <Form.Item
+          label="صورة المعلم"
+          name="image"
+        >
+          <Upload
+            customRequest={({ file, onSuccess, onError }) => {
+              setImageFile(file); // Set the file object
+              onSuccess(); // Call onSuccess for file upload
+            }}
+            showUploadList={false}
+            accept="image/*"
+            onChange={handleImageChange}
+          >
+            <Button icon={<UploadOutlined />}>رفع صورة</Button>
+          </Upload>
+          {imageFile && (
+            <div className={styles.imagePreview}>
+              <img 
+                src={URL.createObjectURL(imageFile)} 
+                alt="Preview" 
+                className={styles.previewImage}
+              />
             </div>
-            <div>
-              <Link href="/admin/teachers" className="btn btn-outline-secondary">العودة إلى كافة الأساتذة</Link>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-xl-9 col-lg-8 col-md-12 col-12 offset-xl-1 offset-lg-2">
-          <div className="card border-0 mb-4">
-            <div className="card-header">
-              <h4 className="mb-0 tajawal-bold">تسجيل الأستاذ</h4>
-            </div>
-            <form className="needs-validation" onSubmit={handleSubmit}>
-              <div className="card-body">
-                <div className="mb-3 col-md-9 position-relative">
-                  <label htmlFor="user_id" className="form-label">المستخدم</label>
-                  <div className="position-relative">
-                    <select
-                      id="user_id"
-                      name="user_id"
-                      className="form-select text-dark"
-                      value={formData.user_id}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">اختر مستخدم</option>
-                      {users.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+          )}
+        </Form.Item>
 
-                <div className="mb-3 col-md-9">
-                  <label htmlFor="first_name" className="form-label">الإسم الأول</label>
-                  <input
-                    type="text"
-                    id="first_name"
-                    name="first_name"
-                    className="form-control text-dark"
-                    placeholder="الإسم الأول"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3 col-md-9">
-                  <label htmlFor="last_name" className="form-label">الإسم الأخير</label>
-                  <input
-                    type="text"
-                    id="last_name"
-                    name="last_name"
-                    className="form-control text-dark"
-                    placeholder="الإسم الأخير"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="mb-3 col-md-9">
-                  <label htmlFor="bio" className="form-label">السيرة الذاتية</label>
-                  <ReactQuill
-                  direction="rtl"
-                    id="bio"
-                    name="bio"
-                    value={formData.bio}
-                    placeholder='المرجو كتابة الوصف ...'
-                    onChange={(value) => setFormData({ ...formData, bio: value })}
-                    modules={{
-                      toolbar: [
-                        [{ 'header': '1'}, {'header': '2'}],
-                        [{ 'align': ['right', 'center'] }],
-                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }], 
-                      ],
-                    }}  
-                    formats={[
-                      'header', 'font', 'align', 'bold', 'italic', 'underline', 'strike', 'blockquote',
-                      'list', 'bullet', 'link', 'image', 'video'
-                    ]}
-                    theme="snow"
-                  />
-                </div>
-
-                <div className="mb-3 col-md-9">
-                  <label htmlFor="hourly_rate" className="form-label">معدل الأجر بالساعة</label>
-                  <div className="input-group">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={handleDecrement}
-                      style={{ borderTopRightRadius: '0.25rem', borderBottomRightRadius: '0.25rem' }}
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      step="0.1" // Allow decimal steps
-                      id="hourly_rate"
-                      name="hourly_rate"
-                      className="form-control text-dark text-center"
-                      value={formData.hourly_rate}
-                      onChange={handleChange}
-                      required
-                      min="0"
-                    />
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={handleIncrement}
-                      style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mb-3 col-md-9">
-                  <label htmlFor="slug" className="form-label">السمة</label>
-                  <input
-                    type="text"
-                    id="slug"
-                    name="slug"
-                    className="form-control text-dark"
-                    placeholder="السمة"
-                    value={formData.slug}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <button type="submit" className="m-1 btn btn-primary w-10">إضافة</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className="w-100">
+            إضافة
+          </Button>
+        </Form.Item>
+      </Form>
     </section>
   );
 };
 
-export default Page;
-
-
-
+export default AddTeacherPage;

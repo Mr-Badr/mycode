@@ -1,95 +1,128 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
+import { Table, Dropdown, Menu, Button, Modal } from 'antd';
+import { DownOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import FormationDetailsModal from './FormationDetailsModal'; // Import the modal component
 
 const FormationsTable = ({ formations, formationTypes = [], handleEditClick, handleDeleteClick }) => {
-  // Function to get the formation type name based on the typeId
+  const [selectedFormation, setSelectedFormation] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
   const getFormationTypeName = (typeId) => {
     const type = formationTypes.find(type => type.id === typeId);
-    return type ? type.name : 'غير معروف'; // Return 'Unknown' if type is not found
+    return type ? type.name : 'غير معروف';
   };
+
+  const handleShowDetails = (formation) => {
+    setSelectedFormation(formation);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedFormation(null);
+  };
+
+  const columns = [
+    {
+      title: 'الإسم',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text, record) => (
+        <div className="d-flex align-items-center">
+          <img
+            src={record.image ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/${record.image.replace('public/', '')}` : "../../assets/images/avatar/avatar-12.jpg"}
+            alt={record.name || "No image"}
+            className="rounded-circle avatar-md me-2"
+            style={{ width: 40, height: 40 }}
+          />
+          <span>{text || "No name"}</span>
+        </div>
+      )
+    },
+    {
+      title: 'نوع الدورة',
+      dataIndex: 'formation_type_id',
+      key: 'formation_type_id',
+      render: (text) => getFormationTypeName(text)
+    },
+    {
+      title: 'الوصف',
+      dataIndex: 'description',
+      key: 'description',
+      render: (text) => (
+        <span style={{ display: 'block', maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {text || "No description"}
+        </span>
+      )
+    },
+    {
+      title: 'الحالة',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text) => text || "Unknown status"
+    },
+    {
+      title: 'تاريخ الإنشاء',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      render: (text) => text ? new Date(text).toLocaleDateString() : "لا يوجد تاريخ"
+    },
+    {
+      title: 'عدد المشاركين',
+      dataIndex: 'formation_participants',
+      key: 'formation_participants',
+      render: (text) => text.length || "0"
+    },
+    {
+      title: 'تفاصيل الدورة',
+      key: 'details',
+      render: (text, record) => (
+        <Button type="link" icon={<InfoCircleOutlined />} onClick={() => handleShowDetails(record)}>
+          عرض التفاصيل
+        </Button>
+      )
+    },
+    {
+      title: 'الإجراءات',
+      key: 'actions',
+      render: (text, record) => (
+        <Dropdown
+          overlay={
+            <Menu>
+              <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => handleEditClick(record)}>
+                تعديل
+              </Menu.Item>
+              <Menu.Item key="delete" icon={<DeleteOutlined />} onClick={() => handleDeleteClick(record.id)}>
+                حذف
+              </Menu.Item>
+            </Menu>
+          }
+          trigger={['click']}
+        >
+          <Button>
+            <DownOutlined />
+          </Button>
+        </Dropdown>
+      )
+    }
+  ];
 
   return (
     <div className="table-responsive">
-      <table className='table mb-0 text-nowrap table-hover table-centered'>
-        <thead className='table-light'>
-          <tr>
-            <th>الإسم</th>
-            <th>نوع الدورة</th>
-            <th>الوصف</th>
-            <th>الحالة</th>
-            <th>التاريخ</th>
-            <th>الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody>
-          {formations.length > 0 ? (
-            formations.map((formation) => (
-              <tr key={formation.id}>
-                <td>
-                  <div className="d-flex align-items-center">
-                    <img
-                      src={formation.image || "../../assets/images/avatar/avatar-12.jpg"}
-                      alt={formation.name || "No image"}
-                      className="rounded-circle avatar-md me-2"
-                    />
-                    <h5 className="mb-0 tajawal-bold">{formation.name || "No name"}</h5>
-                  </div>
-                </td>
-                <td>{getFormationTypeName(formation.formation_type_id)}</td>
-                <td
-                  style={{
-                    height: '50px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '200px'
-                  }}
-                >
-                  {formation.description || "No description"}
-                </td>
-                <td>{formation.status || "Unknown status"}</td>
-                <td>{new Date(formation.date_form).toLocaleDateString()}</td>
-                <td>
-                  <div className="hstack gap-4">
-                    <span className="dropdown dropstart">
-                      <a
-                        className="btn-icon btn btn-ghost btn-sm rounded-circle"
-                        href="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        data-bs-offset="-20,20"
-                        aria-expanded="false"
-                      >
-                        <i className="fe fe-more-vertical"></i>
-                      </a>
-                      <span className="dropdown-menu">
-                        <span className="dropdown-header">الإعدادات</span>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => handleEditClick(formation)}
-                        >
-                          <i className="fe fe-edit dropdown-item-icon"></i>
-                          تعديل
-                        </button>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => handleDeleteClick(formation.id)}
-                        >
-                          <i className="fe fe-trash dropdown-item-icon"></i>
-                          حذف
-                        </button>
-                      </span>
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center">لا توجد بيانات</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <Table
+        columns={columns}
+        dataSource={formations}
+        rowKey="id"
+        pagination={false}
+      />
+
+      {/* Formation Details Modal */}
+      <FormationDetailsModal
+        visible={showModal}
+        onClose={handleCloseModal}
+        formation={selectedFormation}
+      />
     </div>
   );
 };

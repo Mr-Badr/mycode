@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 //import { CKEditor } from '@ckeditor/ckeditor5-react';
 //import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { toast } from 'react-toastify'; // Import toast from react-toastify
-const token = '1|SGXLsW9HyacjrgSkCTtwjBUPKrjkJeQQUsDNzFzs46923d0a'; // Replace with your actual token
+const token = '2|cXHOtrdXzv72FdEtXSS292Ju9wcaxGWEY3wpSlGBc1d19d43'; // Replace with your actual token
 
 
 

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import axios from 'axios';
 import { toast } from 'react-toastify'; // Import toast from react-toastify
-const token = '1|SGXLsW9HyacjrgSkCTtwjBUPKrjkJeQQUsDNzFzs46923d0a'; // Replace with your actual token
+const token = '2|cXHOtrdXzv72FdEtXSS292Ju9wcaxGWEY3wpSlGBc1d19d43'; // Replace with your actual token
 
 function Page() {
   

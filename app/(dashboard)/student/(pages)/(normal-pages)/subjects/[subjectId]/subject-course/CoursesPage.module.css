@@ -1,8 +1,6 @@
 .cardContainer {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around; /* Center the cards horizontally */
-  gap: 16px;
 }
 
 .courseCard {
@@ -16,7 +14,7 @@
 }
 
 .courseCard:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .cardImgTop {

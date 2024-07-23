@@ -1,16 +1,17 @@
-"use client"
-import Link from 'next/link'
+"use client";
+import Link from 'next/link';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify'; // Import toast from react-toastify
 import 'react-toastify/dist/ReactToastify.css';
 
-const AddFormationPage = () => {
+const AddCoursePage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    formation_type_id: 15, // Replace with the appropriate formation_type_id
+    subject_id: 65, // Replace with the actual subject_id you want to associate with the course
+    title: '',
+    slug: '',
     description: '',
-    status: 'active' // Assuming a default status
+    body: ''
   });
 
   const handleChange = (e) => {
@@ -20,7 +21,7 @@ const AddFormationPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = '1|SGXLsW9HyacjrgSkCTtwjBUPKrjkJeQQUsDNzFzs46923d0a'; // Replace with your actual JWT token or authentication header
+      const token = '2|cXHOtrdXzv72FdEtXSS292Ju9wcaxGWEY3wpSlGBc1d19d43'; // Replace with your actual JWT token or authentication header
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -28,18 +29,16 @@ const AddFormationPage = () => {
         }
       };
 
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/formations`, formData, config);
-      console.log('Formation added successfully:', response.data);
-      
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/courses`, formData, config);
+      console.log('Course added successfully:', response.data);
       // If successful, show success toast
-      toast.success('تم إضافة الدورة بنجاح!', {
+      toast.success('تم إضافة الدرس بنجاح!', {
         position: "bottom-right"
       });
     } catch (error) {
-      console.error('Error adding formation:', error);
-      
+      console.error('Error adding course:', error);
       // If there's an error, show error toast
-      toast.error('حدث خطأ أثناء إضافة الدورة. الرجاء المحاولة مرة أخرى.', {
+      toast.error('حدث خطأ أثناء إضافة الدرس. الرجاء المحاولة مرة أخرى.', {
         position: "bottom-right"
       });
     }
@@ -52,7 +51,7 @@ const AddFormationPage = () => {
         <div className="col-lg-12 col-md-12 col-12">
           <div className="border-bottom pb-3 mb-3 d-md-flex align-items-center justify-content-between">
             <div className="mb-3 mb-md-0">
-              <h1 className="mb-1 tajawal-bold">إضافة دورة جديدة</h1>
+              <h1 className="mb-1 tajawal-bold">إضافة درس جديد</h1>
               {/*  Breadcrumb  */}
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
@@ -60,12 +59,12 @@ const AddFormationPage = () => {
                     <Link href="/admin">لوحة التحكم</Link>
                   </li>
                   <li className="breadcrumb-item"><a href="#">CMS</a></li>
-                  <li className="breadcrumb-item active" aria-current="page">إضافة دورة جديدة</li>
+                  <li className="breadcrumb-item active" aria-current="page">إضافة درس جديد</li>
                 </ol>
               </nav>
             </div>
             <div>
-              <Link href="/admin/formations" className="btn btn-outline-secondary">العودة إلى كافة الدورات</Link>
+              <Link href="/admin/courses" className="btn btn-outline-secondary">العودة إلى كافة الدورات</Link>
             </div>
           </div>
         </div>
@@ -74,19 +73,32 @@ const AddFormationPage = () => {
         <div className="col-xl-9 col-lg-8 col-md-12 col-12 offset-xl-1 offset-lg-2">
           <div className="card border-0 mb-4">
             <div className="card-header">
-              <h4 className="mb-0 tajawal-bold">تسجيل الدورة</h4>
+              <h4 className="mb-0 tajawal-bold">تسجيل الدرس</h4>
             </div>
             <form className="needs-validation" onSubmit={handleSubmit}>
               <div className="card-body">
                 <div className="mb-3 col-md-9">
-                  <label htmlFor="name" className="form-label">الإسم</label>
+                  <label htmlFor="title" className="form-label">العنوان</label>
                   <input
                     type="text"
-                    id="name"
-                    name="name"
+                    id="title"
+                    name="title"
                     className="form-control text-dark"
-                    placeholder="الإسم"
-                    value={formData.name}
+                    placeholder="العنوان"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3 col-md-9">
+                  <label htmlFor="slug" className="form-label">السمة</label>
+                  <input
+                    type="text"
+                    id="slug"
+                    name="slug"
+                    className="form-control text-dark"
+                    placeholder="السمة"
+                    value={formData.slug}
                     onChange={handleChange}
                     required
                   />
@@ -103,6 +115,18 @@ const AddFormationPage = () => {
                     onChange={handleChange}
                   ></textarea>
                 </div>
+                <div className="mb-3 col-md-9">
+                  <label htmlFor="body" className="form-label">المحتوى</label>
+                  <textarea
+                    rows="6"
+                    id="body"
+                    name="body"
+                    className="form-control text-dark"
+                    placeholder="المحتوى"
+                    value={formData.body}
+                    onChange={handleChange}
+                  ></textarea>
+                </div>
 
                 <button type="submit" className="btn btn-primary w-20">إضافة</button>
               </div>
@@ -111,7 +135,7 @@ const AddFormationPage = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default AddFormationPage;
+export default AddCoursePage;
