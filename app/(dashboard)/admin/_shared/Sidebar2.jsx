@@ -49,8 +49,8 @@ function Navbar() {
                 <Menu.Item key="/admin/students">
                   <Link href="/admin/students">جميع الطلاب</Link>
                 </Menu.Item>
-                <Menu.Item key="/admin/students-add">
-                  <Link href="/admin/students-add">إضافة طالب</Link>
+                <Menu.Item key="/admin/students/add-student">
+                  <Link href="/admin/students/add-student">إضافة طالب</Link>
                 </Menu.Item>
               </Menu.SubMenu>
 

@@ -1,0 +1,62 @@
+.courseDetailContainer {
+  margin-top: 5rem;
+  text-align: center;
+}
+.courseImage {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.courseTitle {
+  font-size: 2rem;
+  margin: 20px 0;
+}
+
+.courseDescription {
+  font-size: 1.25rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.courseBody {
+  margin-top: 2rem;
+  text-align: right;
+  padding: 3rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.cardsContainer {
+  margin-top: 2rem;
+}
+
+.cardsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.card {
+  width: calc(25% - 16px);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.ant-card-meta-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ant-card-meta-description {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

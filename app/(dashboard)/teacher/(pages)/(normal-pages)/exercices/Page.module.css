@@ -1,0 +1,83 @@
+.courseSection {
+  margin-bottom: 40px;
+  padding: 20px;
+  border-radius: 8px;
+  background: #f5f5f5; /* Light gray background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.courseTitle {
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #333; /* Darker text color */
+}
+
+.exerciseCol {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: stretch; /* Ensures all cards are the same height */
+}
+
+.exerciseCard {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 300px; /* Fixed height for uniform cards */
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Ensures cards have the same width */
+  background: #fff; /* Card background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.actions {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.exerciseCard:hover .actions {
+  opacity: 1;
+}
+
+.actions .anticon {
+  color: #1890ff; /* Primary color for the icons */
+}
+
+.cardMeta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardMeta .ant-card-meta-title {
+  font-weight: 600;
+  color: #333; /* Darker text color */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* Truncate long titles */
+}
+
+.cardMeta .ant-card-meta-description {
+  color: #666; /* Gray color for the description */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* Truncate long descriptions */
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-top: 1px solid #e8e8e8;
+  background: #fff;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}

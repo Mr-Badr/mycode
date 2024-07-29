@@ -1,13 +1,13 @@
-"use client"
+"use client";
 import React, { useState } from 'react';
-import { Table, Button, Tooltip, Popconfirm } from 'antd';
-import { TiPlus } from 'react-icons/ti';
-import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'; // Import Ant Design icons
+import { Table, Button, Tooltip, notification } from 'antd';
+import { EyeOutlined, EditOutlined, DeleteOutlined, UserAddOutlined, CheckCircleOutlined } from '@ant-design/icons'; // Import Ant Design icons
 import FormationDetailsModal from './FormationDetailsModal'; // Import the new modal component
 
 const FormationsTable = ({ filtered, searchTerm, handleSearchChange, handleShowAddFormationPopup, handleEdit, handleDelete }) => {
   const [visible, setVisible] = useState(false);
   const [selectedFormation, setSelectedFormation] = useState(null);
+  const [joinedFormations, setJoinedFormations] = useState(new Set()); // To keep track of joined formations
 
   const showDetails = (record) => {
     setSelectedFormation(record);
@@ -19,9 +19,28 @@ const FormationsTable = ({ filtered, searchTerm, handleSearchChange, handleShowA
     setSelectedFormation(null);
   };
 
+  const handleJoin = (id) => {
+    // Logic for joining the formation (e.g., API call)
+    console.log(`Student joined formation with ID: ${id}`);
+    
+    // Add formation ID to the set of joined formations
+    setJoinedFormations(prevState => new Set(prevState.add(id)));
+    
+    // Show success notification
+    notification.success({
+      message: 'تم الانضمام',
+      description: 'لقد انضممت بنجاح إلى الدورة.',
+      placement: 'topRight',
+      style: {
+        direction: 'rtl', // RTL direction
+        textAlign: 'right' // Align text to the right
+      }
+    });
+  };
+
   const columns = [
     {
-      title: 'الصورة واسم الدورة',
+      title: '  الدورة',
       key: 'image_name',
       render: (text, record) => (
         <div className="d-flex align-items-center">
@@ -68,46 +87,21 @@ const FormationsTable = ({ filtered, searchTerm, handleSearchChange, handleShowA
       width: '15%' // Adjust width as needed
     },
     {
-      title: 'التفاصيل',
-      key: 'details',
+      title: 'الإنضمام',
+      key: 'join',
       render: (text, record) => (
-        <Tooltip title="عرض التفاصيل">
-          <Button 
-            icon={<EyeOutlined />} 
-            onClick={() => showDetails(record)} 
-          />
+        <Tooltip title={joinedFormations.has(record.id) ? 'لقد انضممت' : 'انضمام إلى الدورة'}>
+          <Button
+            icon={joinedFormations.has(record.id) ? <CheckCircleOutlined /> : <UserAddOutlined />}
+            type={joinedFormations.has(record.id) ? 'default' : 'primary'}
+            disabled={joinedFormations.has(record.id)}
+            onClick={() => !joinedFormations.has(record.id) && handleJoin(record.id)}
+          >
+            {joinedFormations.has(record.id) ? 'تم الانضمام' : 'انضم'}
+          </Button>
         </Tooltip>
       ),
-      width: '15%' // Adjust width as needed
-    },
-    {
-      title: 'الإجراءات',
-      key: 'actions',
-      render: (text, record) => (
-        <div className="d-flex">
-          <Tooltip title="تعديل">
-            <Button 
-              icon={<EditOutlined />} 
-              onClick={() => handleEdit(record.id)} 
-              className="me-2" 
-            />
-          </Tooltip>
-          <Tooltip title="حذف">
-            <Popconfirm
-              title="هل أنت متأكد أنك تريد حذف هذه الدورة؟"
-              onConfirm={() => handleDelete(record.id)}
-              okText="نعم"
-              cancelText="لا"
-            >
-              <Button 
-                icon={<DeleteOutlined />} 
-                danger 
-              />
-            </Popconfirm>
-          </Tooltip>
-        </div>
-      ),
-      width: '15%' // Adjust width as needed
+      width: '20%' // Increased width for the join column
     }
   ];
 
@@ -119,11 +113,6 @@ const FormationsTable = ({ filtered, searchTerm, handleSearchChange, handleShowA
             <h3 className="mb-0 tajawal-bold">الدورات</h3>
             <span>نظرة عامة وسريعة على جميع الدورات الحالية.</span>
           </div>
-          {/* <div className="card-header border-bottom-0 d-flex align-items-center justify-content-center">
-            <Button type="primary" onClick={handleShowAddFormationPopup} icon={<TiPlus />}>
-              إضافة دورة
-            </Button>
-          </div> */}
         </div>
       </div>
       <div className="table-responsive">

@@ -1,13 +1,11 @@
-"use client";
+"use client"
 import React from 'react';
 import { Table, Dropdown, Menu, Button } from 'antd';
-import { EditOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
+import DOMPurify from 'dompurify'; // Library to sanitize HTML
 
 const SubjectTable = ({ subjects, handleEditClick, handleDeleteClick }) => {
-  // Log the subjects data to the console for debugging
-  console.log("Subjects Data:", subjects);
-
   const pathname = usePathname();
 
   const columns = [
@@ -53,6 +51,11 @@ const SubjectTable = ({ subjects, handleEditClick, handleDeleteClick }) => {
       title: 'الوصف',
       dataIndex: 'description',
       key: 'description',
+      render: (text) => (
+        <div
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text) }}
+        />
+      ),
     },
     {
       title: 'الأستاذ',
@@ -89,7 +92,9 @@ const SubjectTable = ({ subjects, handleEditClick, handleDeleteClick }) => {
             </Menu.Item>
           </Menu>
         }>
-          <Button icon={<MoreOutlined />} />
+          <Button>
+            <DownOutlined />
+          </Button>
         </Dropdown>
       ),
     },

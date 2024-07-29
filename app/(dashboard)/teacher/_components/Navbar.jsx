@@ -102,15 +102,26 @@ function Navbar() {
 							</Link>
 						</li>
 
-						{/*  Nav item  */}
-						<li className={pathname === '/teacher/competitions' ? 'nav-item tajawal-bold active' : 'nav-item'}>
-							<Link href="/teacher/competitions" className="nav-link">
-								<i className="fe fe-award nav-icon"></i>
-								<span className={pathname === '/teacher/competitions' ? 'tajawal-bold' : ''}>
-									المسابقات
-								</span>
-							</Link>
-						</li>
+{/* Nav item */}
+<li className={pathname === '/teacher/competitions' ? 'nav-item tajawal-bold active' : 'nav-item'}>
+    <Link href="/teacher/competitions" className="nav-link">
+        <i className="fe fe-award nav-icon"></i> {/* Icon for Competitions */}
+        <span className={pathname === '/teacher/competitions' ? 'tajawal-bold' : ''}>
+            المسابقات
+        </span>
+    </Link>
+</li>
+
+{/* Nav item */}
+<li className={pathname === '/teacher/quiz' ? 'nav-item tajawal-bold active' : 'nav-item'}>
+    <Link href="/teacher/quiz" className="nav-link">
+        <i className="fe fe-edit nav-icon"></i> {/* Icon for Quizzes */}
+        <span className={pathname === '/teacher/quiz' ? 'tajawal-bold' : ''}>
+            الإختبارات
+        </span>
+    </Link>
+</li>
+
 
 						{/*  Nav item  */}
 						<li className={pathname === '/teacher/competitions-result' ? 'nav-item tajawal-bold active' : 'nav-item'}>

@@ -1,11 +1,15 @@
 "use client";
+
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Table, Card, Typography, Input, Breadcrumb, Button, Modal, Form, Input as AntdInput } from 'antd';
-import axiosinstance from '../../../../../../services/axiosInstance'; // Adjust the import path to your Axios instance
-
-const { Title } = Typography;
-const { Search } = Input;
+import axiosInstance from '../../../../../../services/axiosInstance'; // Adjust the import path to your Axios instance
+import { ArrowLeftOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { toast } from 'react-toastify';
+import { Table, Button, Modal, Form, Input, Upload } from 'antd';
+import Search from 'antd/es/input/Search';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import DOMPurify from 'dompurify'; // Library to sanitize HTML
 
 const CoursesPage = ({ params }) => {
   const { subjectId } = params; // Extract subjectId from params
@@ -17,12 +21,15 @@ const CoursesPage = ({ params }) => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false); // State for Add Modal
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [form] = Form.useForm();
+  const [previewImage, setPreviewImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null); // State for the image file
 
   useEffect(() => {
     if (subjectId) {
-      axiosinstance.get(`/subjects/${subjectId}/courses`) // Adjust the endpoint if necessary
+      axiosInstance.get(`/subjects/${subjectId}/courses`) // Adjust the endpoint if necessary
         .then(response => {
           if (response.data && Array.isArray(response.data.data)) {
             setCourses(response.data.data); // Set the courses data
@@ -54,7 +61,11 @@ const CoursesPage = ({ params }) => {
 
   const handleEditClick = (course) => {
     setSelectedCourse(course);
-    form.setFieldsValue(course); // Populate form with selected course data
+    form.setFieldsValue({
+      title: course.title,
+      description: course.description,
+      body: course.body
+    }); // Populate form with selected course data
     setShowEditModal(true);
   };
 
@@ -63,29 +74,104 @@ const CoursesPage = ({ params }) => {
     setShowDeleteModal(true);
   };
 
+  const handleAddClick = () => {
+    setShowAddModal(true); // Show Add Modal
+  };
+
   const handleCloseEditModal = () => setShowEditModal(false);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
+  const handleCloseAddModal = () => setShowAddModal(false); // Close Add Modal
 
   const confirmDelete = () => {
-    // Implement delete logic here
-    handleCloseDeleteModal();
-  };
+    if (selectedCourse) {
+      axiosInstance.delete(`/subjects/${sub 
 
   const handleSaveClick = () => {
     form
       .validateFields()
       .then(values => {
-        // Implement save logic here
-        axiosinstance.put(`/courses/${selectedCourse.id}`, values)
-          .then(response => {
-            // Update state with new data
-            setCourses(courses.map(course => course.id === selectedCourse.id ? response.data : course));
-            setFilteredCourses(courses);
-            handleCloseEditModal();
+        if (selectedCourse) {
+          const formData = new FormData();
+          formData.append('subject_id', subjectId);
+          formData.append('title', values.title);
+          formData.append('slug', values.title.toLowerCase().replace(/\s+/g, '-'));
+          formData.append('description', values.description);
+          formData.append('body', values.body);
+  
+          // Append image if available
+          if (imageFile) {
+            // Check file size (example: 5MB)
+            if (imageFile.size > 5 * 1024 * 1024) {
+              toast.error('الملف كبير جداً. يرجى استخدام ملف أصغر.', { position: "bottom-right" });
+              return;
+            }
+            formData.append('image', imageFile);
+          }
+  
+          console.log("***");
+          console.log(formData);
+          console.log("***");
+  
+          axiosInstance.post(`/courses`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           })
-          .catch(error => {
-            console.error('Error updating course:', error);
+            .then(response => {
+              setCourses(courses.map(course => course.id === selectedCourse.id ? response.data : course));
+              setFilteredCourses(courses.map(course => course.id === selectedCourse.id ? response.data : course));
+              handleCloseEditModal();
+            })
+            .catch(error => {
+              console.error('Error updating course:', error.response ? error.response.data : error.message);
+            });
+        }
+      })
+      .catch(error => {
+        console.error('Validation failed:', error);
+      });
+  };
+  
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = () => setPreviewImage(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddCourse = async () => {
+    form
+      .validateFields()
+      .then(async (values) => {
+        const { title, description, body } = values;
+        const formData = new FormData();
+        formData.append('subject_id', subjectId);
+        formData.append('title', title);
+        formData.append('slug', title.toLowerCase().replace(/\s+/g, '-'));
+        formData.append('description', description);
+        formData.append('body', body);
+        if (imageFile) {
+          formData.append('image', imageFile);
+        }
+
+        try {
+          const response = await axiosInstance.post('/courses', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           });
+
+          console.log('Course added successfully:', response.data);
+          toast.success('تم إضافة الدورة بنجاح!', { position: "bottom-right" });
+          router.push('/admin/courses');
+        } catch (error) {
+          console.error('Error adding course:', error.response ? error.response.data : error.message);
+          toast.error('حدث خطأ أثناء إضافة الدورة. الرجاء المحاولة مرة أخرى.', { position: "bottom-right" });
+        }
       })
       .catch(error => {
         console.error('Validation failed:', error);
@@ -97,6 +183,36 @@ const CoursesPage = ({ params }) => {
       title: 'عنوان الدورة',
       dataIndex: 'title',
       key: 'title',
+      render: (text, record) => (
+        <div style={{ cursor: 'pointer', color: 'blue' }} onClick={() => router.push(`/admin/subjects/${subjectId}/courses/${record.id}`)}>
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: 'الصورة',
+      key: 'image',
+      render: (_, record) => (
+        <div>
+          <img
+            src={record.image ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/${record.image.replace('public/', '')}` : '/default-image.jpg'}
+            alt={record.title}
+            style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: '8px', cursor: 'pointer' }}
+            onClick={() => setPreviewImage(`${process.env.NEXT_PUBLIC_STORAGE_URL}/${record.image.replace('public/', '')}`)}
+          />
+          {previewImage && (
+            <Modal
+              visible={!!previewImage}
+              footer={null}
+              onCancel={() => setPreviewImage(null)}
+              width={800}
+            >
+              <img src={previewImage} alt="Preview" style={{ width: '100%', height: 'auto' }} />
+            </Modal>
+          )}
+        </div>
+      ),
+      width: 120, // Adjust the width as needed
     },
     {
       title: 'الوصف',
@@ -104,47 +220,37 @@ const CoursesPage = ({ params }) => {
       key: 'description',
     },
     {
-      title: 'الصورة',
-      key: 'image',
-      render: (_, record) => (
-        <img
-          src={record.image ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/${record.image.replace('public/', '')}` : '/default-image.jpg'}
-          alt={record.title}
-          style={{ width: 80, height: 60, objectFit: 'cover' }}
-        />
+      title: 'المحتوى',
+      dataIndex: 'body',
+      key: 'body',
+      render: (text) => (
+        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text) }} />
       ),
     },
     {
       title: 'الإجراءات',
       key: 'actions',
       render: (_, record) => (
-        <div>
-  <Button
-    onClick={() => handleEditClick(record)}
-    type="primary"
-    style={{ 
-      marginRight: 16, // Increased margin between buttons
-      backgroundColor: '#1890ff', 
-      borderColor: '#1890ff' 
-    }}
-  >
-    تعديل
-  </Button>
-  <Button
-    onClick={() => handleDeleteClick(record)}
-    type="default"
-    style={{ 
-      color: '#ffffff', // White text color
-      backgroundColor: '#ff4d4f', 
-      borderColor: '#ff4d4f',
-      marginLeft: 8 // Margin to the left of the delete button
-    }}
-  >
-    حذف
-  </Button>
-</div>
-
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button
+            onClick={() => handleEditClick(record)}
+            type="primary"
+            style={{ backgroundColor: '#1890ff', borderColor: '#1890ff' }}
+          >
+            <EditOutlined style={{ marginRight: 8 }} />
+            تعديل
+          </Button>
+          <Button
+            onClick={() => handleDeleteClick(record)}
+            type="default"
+            style={{ color: '#ffffff', backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' }}
+          >
+            <DeleteOutlined style={{ marginRight: 8 }} />
+            حذف
+          </Button>
+        </div>
       ),
+      width: 230, // Adjust the width as needed
     },
   ];
 
@@ -153,70 +259,110 @@ const CoursesPage = ({ params }) => {
   };
 
   return (
-    <div className="container-fluid p-6">
-      <div className="border-bottom pb-3 mb-3 d-flex justify-content-between align-items-center">
-        <Breadcrumb>
-          <Breadcrumb.Item>الرئيسية</Breadcrumb.Item>
-          <Breadcrumb.Item onClick={() => router.push('/subjects')}>المواد</Breadcrumb.Item>
-          <Breadcrumb.Item>الدورات</Breadcrumb.Item>
-        </Breadcrumb>
-        <Title level={2}>الدورات الخاصة بالمادة</Title>
+    <div className="container-fluid p-6" style={{ direction: 'rtl' }}>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1 className="mb-1">الدورات الخاصة بالمادة</h1>
         <Button
-          onClick={() => router.back()}
-          type="default"
-          style={{ marginTop: 16, backgroundColor: '#f0f0f0' }}
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleAddClick}
         >
-          العودة
+          إضافة دورة جديدة
         </Button>
       </div>
 
       <Search
-        placeholder="ابحث عن دورة"
-        value={searchTerm}
+        placeholder="بحث"
         onChange={handleSearchChange}
-        style={{ marginBottom: 20 }}
+        style={{ marginBottom: 20, width: '100%' }}
       />
 
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={filteredCourses}
-          rowKey="id"
-          pagination={{
-            current: currentPage,
-            pageSize: itemsPerPage,
-            onChange: paginate,
-            total: filteredCourses.length,
-          }}
-        />
-      </Card>
+      <Table
+        columns={columns}
+        dataSource={filteredCourses}
+        pagination={{
+          current: currentPage,
+          pageSize: itemsPerPage,
+          total: filteredCourses.length,
+          onChange: paginate,
+        }}
+        rowKey="id"
+      />
 
+      {/* Edit Modal */}
       <Modal
         title="تعديل الدورة"
         visible={showEditModal}
-        onCancel={handleCloseEditModal}
         onOk={handleSaveClick}
+        onCancel={handleCloseEditModal}
         okText="حفظ"
         cancelText="إلغاء"
       >
         <Form form={form} layout="vertical">
           <Form.Item name="title" label="عنوان الدورة" rules={[{ required: true, message: 'يرجى إدخال عنوان الدورة' }]}>
-            <AntdInput />
+            <Input />
           </Form.Item>
-          <Form.Item name="description" label="الوصف" rules={[{ required: true, message: 'يرجى إدخال الوصف' }]}>
-            <AntdInput.TextArea rows={4} />
+          <Form.Item name="description" label="الوصف" rules={[{ required: true, message: 'يرجى إدخال وصف الدورة' }]}>
+            <Input.TextArea />
           </Form.Item>
-          <Form.Item name="image" label="رابط الصورة" rules={[{ required: true, message: 'يرجى إدخال رابط الصورة' }]}>
-            <AntdInput />
+          <Form.Item name="body" label="المحتوى" rules={[{ required: true, message: 'يرجى إدخال محتوى الدورة' }]}>
+            <ReactQuill
+              value={form.getFieldValue('body')}
+              onChange={(value) => form.setFieldsValue({ body: value })}
+              theme="snow"
+            />
+          </Form.Item>
+          <Form.Item label="الصورة">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            {previewImage && <img src={previewImage} alt="Preview" style={{ width: '100px', height: 'auto', marginTop: '10px' }} />}
           </Form.Item>
         </Form>
       </Modal>
 
+      {/* Add Modal */}
+      <Modal
+        title="إضافة دورة جديدة"
+        visible={showAddModal}
+        onOk={handleAddCourse}
+        onCancel={handleCloseAddModal}
+        okText="إضافة"
+        cancelText="إلغاء"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="title" label="عنوان الدورة" rules={[{ required: true, message: 'يرجى إدخال عنوان الدورة' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="description" label="الوصف" rules={[{ required: true, message: 'يرجى إدخال وصف الدورة' }]}>
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item name="body" label="المحتوى" rules={[{ required: true, message: 'يرجى إدخال محتوى الدورة' }]}>
+            <ReactQuill
+              value={form.getFieldValue('body')}
+              onChange={(value) => form.setFieldsValue({ body: value })}
+              theme="snow"
+            />
+          </Form.Item>
+          <Form.Item label="الصورة">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            {previewImage && <img src={previewImage} alt="Preview" style={{ width: '100px', height: 'auto', marginTop: '10px' }} />}
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
       <Modal
         title="تأكيد الحذف"
         visible={showDeleteModal}
-        onCancel={handleCloseDeleteModal}
         onOk={confirmDelete}
+        onCancel={handleCloseDeleteModal}
         okText="حذف"
         cancelText="إلغاء"
       >
